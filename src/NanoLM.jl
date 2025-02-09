@@ -18,7 +18,7 @@ Parameters:
 - B: temperature parameter
 - energy_fn: function that computes E(x_k | x_{<k})
 """
-struct AutoregressiveEBLM{T} <: EnergyBasedLM
+struct AutoregressiveEBLM <: EnergyBasedLM
     V::Vector{Int64}                    # Vocabulary
     n::Int                         # Sequence length
     B::Float64                     # Temperature parameter
@@ -26,17 +26,19 @@ struct AutoregressiveEBLM{T} <: EnergyBasedLM
     energy_fn::Function            # E(x_k | x_{<k})
 end
 
+
 """
 Example: General sequence model with arbitrary pairwise interactions
 E(x_k | x_{<k}) = -∑_{j<k} J[j,k] * x_k * x_j
 """
-function AutoregressiveEBLM(n::Int, B::Float64, J::Matrix{Float64}, V::Vector,π::Vector)
+function AutoregressiveEBLM(V::Vector{Int64},n::Int, B::Float64, J::Matrix{Float64},π::Vector{Float64})
     
     function energy(x_k, prefix, k)
-        -sum(J[j,k] * x_k * prefix[j] for j in 1:k-1)
+        -sum(J[j,k] * x_k * prefix[j] for j in 1:k)
     end
     
-    return AutoregressiveEBLM(V, n, B, π,energy)
+    AutoregressiveEBLM(V, n, B, π,energy)
+
 end
 
 include("math.jl")
