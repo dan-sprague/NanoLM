@@ -5,9 +5,8 @@ where Z_k = ∑_{v ∈ V} exp(-B * E(v | x_{<k}))
 """
 function conditional_distribution(model::AutoregressiveEBLM, prefix::Vector)
     k = length(prefix)
-    
     # Compute unnormalized probabilities for each vocabulary item
-    energies = [model.energy_fn(voc_item, prefix, k) for voc_item in model.V]
+    energies = model.energy_fn.(model.V, Ref(prefix), Ref(k))
     unnormalized = exp.(-model.B * energies)
     
     # Normalize
