@@ -1,0 +1,4 @@
+name = "NanoLM"
+uuid = "2c8319e7-a80d-4375-ad46-a64a42439291"
+authors = ["dan-sprague <spragud@gmail.com>"]
+version = "0.1.0"
