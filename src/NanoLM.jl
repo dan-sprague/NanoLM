@@ -32,6 +32,26 @@ function (model::AutoregressiveEBLM)(x_k, prefix,k)
 end
 
 
+struct EBLM <: EnergyBasedLM
+    V::Vector{Float64}                    # Vocabulary
+    n::Int                         # Sequence length
+    β::Float64                     # Temperature parameter
+    π::Vector{Float64}              # Prior distribution over vocabulary
+    J::Matrix{Float64}
+
+    U::Function
+    ∇U::Function
+end
+
+function EBLM(V,n,β,π,J)
+    U(x) = -β*(x' * J * x)
+    ∇U(x) = -β*(J + J')*x
+
+    EBLM(V,n,β,π,J,U,∇U)
+end
+
+
+
 include("math.jl")
 
 

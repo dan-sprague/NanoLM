@@ -77,3 +77,40 @@ function enumerate_sequences(model::AutoregressiveEBLM)
     return sequences, probs
 
 end
+
+"""
+Calculate probabilities for all possible sequences
+Returns:
+- sequences: Matrix where each column is a sequence
+- probs: Vector of corresponding probabilities
+"""
+function enumerate_sequences(model::EBLM)
+    n_sequences = 2^model.n
+    sequences = zeros(model.n, n_sequences)
+    energy = zeros(n_sequences)
+    
+    # Generate all possible sequences
+    for i in 0:(n_sequences-1)
+        # Convert integer to binary sequence using -1,1
+        sequence = [(i >> j) & 1 == 1 ? 1.0 : -1.0 for j in 0:(model.n-1)]
+        sequences[:, i+1] = sequence
+        energy[i+1] = model.U(sequence)
+    end
+    
+    return sequences, energy
+
+end
+
+
+function proj(x)
+    2 .* (x .> 0) .- 1
+end
+
+
+
+function sample(model::EBLM,x;α=10.0)
+    x_prime = x - ((α/2) * model.∇U(x)) + (sqrt(α) *randn(model.n))
+
+    rand() < exp(model.U(x) - model.U(x_prime)) ? 2 .* (x_prime .> 0) .- 1 : x
+    
+end
